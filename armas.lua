@@ -1,45 +1,30 @@
+-- Script no StarterPlayerScripts (LocalScript)
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local function puxarArma(jogador, nomeArma)
-    if jogador and jogador.Character then
-        local armaOriginal = ReplicatedStorage:FindFirstChild(nomeArma)
-        if armaOriginal then
-            local arma = armaOriginal:Clone()
-            arma.Parent = jogador.Backpack
-            print("[SUCESSO] Arma '" .. nomeArma .. "' foi dada para " .. jogador.Name)
-        else
-            warn("[ERRO] Arma '" .. nomeArma .. "' não encontrada no ReplicatedStorage.")
-        end
-    else
-        warn("[ERRO] Jogador ou personagem inválido ao tentar puxar arma.")
-    end
-end
+-- Criar a GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local function puxarDinheiro(jogador, quantidade)
-    local stats = jogador:FindFirstChild("leaderstats")
-    if stats then
-        local dinheiro = stats:FindFirstChild("Dinheiro")
-        if dinheiro then
-            dinheiro.Value = dinheiro.Value + quantidade
-            print("[SUCESSO] " .. jogador.Name .. " recebeu R$" .. quantidade)
-        else
-            warn("[ERRO] 'Dinheiro' não encontrado em leaderstats de " .. jogador.Name)
-        end
-    else
-        warn("[ERRO] 'leaderstats' não encontrado para " .. jogador.Name)
-    end
-end
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 200, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -100, 0.5, -25)
+toggleButton.Text = "Ativar Expulsão"
+toggleButton.Parent = screenGui
 
-game.Players.PlayerAdded:Connect(function(jogador)
-    print("[INFO] Jogador conectado: " .. jogador.Name)
+-- Criar o RemoteEvent para se comunicar com o servidor
+local remoteEvent = Instance.new("RemoteEvent")
+remoteEvent.Name = "ToggleKick"
+remoteEvent.Parent = ReplicatedStorage
+
+-- Funcionalidade do botão
+toggleButton.MouseButton1Click:Connect(function()
+    -- Alterna entre ativar e desativar a expulsão
+    remoteEvent:FireServer()  -- Aciona o servidor para alternar a expulsão
     
-    jogador.Chatted:Connect(function(mensagem)
-        mensagem = mensagem:lower()
-        
-        if mensagem == "!arma" then
-            puxarArma(jogador, "FAL")
-        elseif mensagem == "!dinheiro" then
-            puxarDinheiro(jogador, 50000)
-        end
-    end)
+    if toggleButton.Text == "Ativar Expulsão" then
+        toggleButton.Text = "Desativar Expulsão"
+    else
+        toggleButton.Text = "Ativar Expulsão"
+    end
 end)
